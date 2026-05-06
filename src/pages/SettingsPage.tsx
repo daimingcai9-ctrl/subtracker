@@ -1,10 +1,22 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Copy, Check, LogOut } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { subscriptions } = useStore();
+  const { subscriptions, userCode } = useStore();
   const [primaryCurrency, setPrimaryCurrency] = useState('CNY');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/?code=${userCode}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSwitch = () => {
+    localStorage.removeItem('subtracker-user-code');
+    window.location.href = '/';
+  };
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleExport = () => {
@@ -53,7 +65,33 @@ export default function SettingsPage() {
     <div className="p-4 md:p-8 max-w-2xl mx-auto">
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">设置</h1>
 
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
+        {/* Account */}
+        <div className="bg-surface rounded-2xl border border-border p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold mb-4">我的邀请码</h2>
+          <div className="bg-surface-alt rounded-xl p-4 text-center mb-4">
+            <div className="text-3xl font-bold font-mono tracking-[0.3em] text-primary">
+              {userCode}
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleCopyLink}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-surface-alt transition-colors"
+            >
+              {copied ? <Check size={16} className="text-success" /> : <Copy size={16} />}
+              {copied ? '已复制' : '复制分享链接'}
+            </button>
+            <button
+              onClick={handleSwitch}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-danger hover:bg-danger/10 transition-colors"
+            >
+              <LogOut size={16} />
+              切换账号
+            </button>
+          </div>
+        </div>
+
         {/* Currency */}
         <div className="bg-surface rounded-2xl border border-border p-6">
           <h2 className="text-lg font-semibold mb-4">主币种</h2>
@@ -134,7 +172,7 @@ export default function SettingsPage() {
             SubTracker — 软件订阅扣费管理工具
           </p>
           <p className="text-xs text-text-secondary mt-2">
-            数据存储在浏览器本地，不会上传到任何服务器。
+            数据按邀请码隔离存储，分享链接给同学即可让他们使用独立空间。
           </p>
         </div>
       </div>

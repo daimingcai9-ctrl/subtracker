@@ -7,10 +7,18 @@ import CalendarPage from './pages/CalendarPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
+import SetupPage from './pages/SetupPage';
 
 export default function App() {
-  const fetchSubscriptions = useStore((s) => s.fetchSubscriptions);
-  useEffect(() => { fetchSubscriptions(); }, []);
+  const userCode = useStore((s) => s.userCode);
+  const init = useStore((s) => s.init);
+
+  useEffect(() => { init(); }, []);
+
+  if (!userCode) {
+    return <SetupPage />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
